@@ -28,8 +28,8 @@ class RadarApp(QtWidgets.QWidget):
         self.musicplay = 0
         self.timer = None  # Timer for 10-second countdown
         self.detection_paused = False  # Flag to indicate if detection is paused
-        self.energy_counter = 0 # 新增計數器
-        self.energy_timer = None # 新增計時器
+        self.energy_counter = 0 
+        self.energy_timer = None 
 
     def setting(self):
         if self.setin == 0:
@@ -97,15 +97,15 @@ class RadarApp(QtWidgets.QWidget):
                 self.memoin = 0
 
     def pot(self):
-        print("hi")# print 是印出結果的語法
+        print("1")
         self.timee = 0
 
     def left(self):
-        print("left")  # print 是印出結果的語法
+        print("2")
         self.timee = 0
 
     def right(self):
-        print("right")  # print 是印出結果的語法
+        print("3")
         self.timee = 0
 
     def initUI(self):
@@ -192,59 +192,58 @@ class RadarApp(QtWidgets.QWidget):
     def updateStatus(self, total_energy):
         self.energyLabel.setText(f'Energy: {total_energy}')
         current_time = time.time()
-        if total_energy > 50000 and not self.detection_paused:  # 修改為 50000
+        if total_energy > 50000 and not self.detection_paused:  
             self.timee += 1
             self.startCountdown()  # Start or reset the 10-second countdown
             self.statusButton.setStyleSheet('background-color: yellow')
             self.statusButton.setText('Status: Object Detected')
             self.updateBellImage(1)
-            self.pauseDetection()  # 暫停檢測1秒，避免重複偵測
+            self.pauseDetection()
 
-        # 更新計數器和計時器
+
         self.energy_counter += 1
         if self.energy_timer is None:
             self.energy_timer = QtCore.QTimer(self)
             self.energy_timer.timeout.connect(self.resetEnergyCounter)
-            self.energy_timer.start(3000)  # 5秒計時器
+            self.energy_timer.start(3000)  # 3秒計時器
 
-            # 偵測鼠標位置並根據觸碰次數移動
+
             current_mouse_position = pyautogui.position()
             if current_mouse_position == (0, 0):
                 if self.energy_counter == 1:
-                    pyautogui.moveTo(10, 10)  # 當鼠標位於原點，觸碰一次為右移
-                    self.resetEnergyCounter()  # 重置計數器和計時器
+                    pyautogui.moveTo(10, 10)
+                    self.resetEnergyCounter()
                 elif self.energy_counter == 2:
-                    pyautogui.moveTo(-10, -10)  # 當鼠標位置位於原點，觸碰兩次為左移
-                    self.resetEnergyCounter()  # 重置計數器和計時器
+                    pyautogui.moveTo(-10, -10)
+                    self.resetEnergyCounter()
             if current_mouse_position == (10, 10):
                 if self.energy_counter == 1:
-                    pyautogui.moveTo(20, 20)  # 當鼠標位置位於(10,10)，觸碰一次為右移
-                    self.resetEnergyCounter()  # 重置計數器和計時器
+                    pyautogui.moveTo(20, 20)
+                    self.resetEnergyCounter()
                 if self.energy_counter == 2:
-                    pyautogui.moveTo(0, 0)  # 鼠標位置位於(10,10)，觸碰兩次為左移
-                    self.resetEnergyCounter()  # 重置計數器和計時器
+                    pyautogui.moveTo(0, 0)
+                    self.resetEnergyCounter()
             if current_mouse_position == (-10, -10):
                 if self.energy_counter == 1:
-                    pyautogui.moveTo(0, 0)  # 當鼠標位置位於(-10,-10)，觸碰一次為右移
-                    self.resetEnergyCounter()  # 重置計數器和計時器
+                    pyautogui.moveTo(0, 0)
+                    self.resetEnergyCounter()
                 if self.energy_counter == 2:
-                    pyautogui.moveTo(-20, -20)  # 當鼠標位置位於(-10,-10)，觸碰兩次為左移
-                    self.resetEnergyCounter()  # 重置計數器和計時器
+                    pyautogui.moveTo(-20, -20)
+                    self.resetEnergyCounter()
     def resetEnergyCounter(self):
         self.energy_counter = 0
         if self.energy_timer:
             self.energy_timer.stop()
             self.energy_timer = None
     def pauseDetection(self):
-        """暂停检测1秒，避免重复检测"""
+
         self.detection_paused = True
-        self.thread.pause()  # 暫停檢測線程
-        QtCore.QTimer.singleShot(1000, self.resumeDetection)  # 0.7秒後恢復檢測
+        self.thread.pause()
+        QtCore.QTimer.singleShot(1000, self.resumeDetection)
 
     def resumeDetection(self):
-        """恢复检测"""
         self.detection_paused = False
-        self.thread.resume()  # 恢復檢測線程
+        self.thread.resume()
 
     def updateBellImage(self, detected):
         if detected:
@@ -261,7 +260,7 @@ class DetectionThread(QtCore.QThread):
         super().__init__()
         self.running = True
         self.paused = False
-        self.lock = QtCore.QMutex()  # 用於線程安全的鎖
+        self.lock = QtCore.QMutex()
 
     def run(self):
         connect()
@@ -272,13 +271,11 @@ class DetectionThread(QtCore.QThread):
         self.running = False
 
     def pause(self):
-        """暫停檢測"""
         self.lock.lock()
         self.paused = True
         self.lock.unlock()
 
     def resume(self):
-        """恢復檢測"""
         self.lock.lock()
         self.paused = False
         self.lock.unlock()
@@ -292,10 +289,10 @@ class DetectionThread(QtCore.QThread):
             self.lock.lock()
             if self.paused:
                 self.lock.unlock()
-                continue  # 如果暂停，跳過這次循環
+                continue
             self.lock.unlock()
 
-            res = R.getResults()  # 獲取接收器數據
+            res = R.getResults()
 
             if res is None:  # 如果獲取到數據
                 continue  # 繼續循環
@@ -313,7 +310,7 @@ def connect():
     reset.startUp()  # Reset hardware register
 
 def startSetting():
-    SettingConfigs.setScriptDir("K60168-Test-00256-008-v0.0.8-20230717_240cm")  # Set the setting folder name
+    SettingConfigs.setScriptDir("K60168-Test-00256-008-v0.0.8-20230717_120cm")  # Set the setting folder name
     ksp = SettingProc()  # Object for setting process to setup the Hardware AI and RF before receive data
     ksp.startUp(SettingConfigs)  # Start the setting process
 
